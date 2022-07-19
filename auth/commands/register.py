@@ -24,7 +24,6 @@ class RegisterUserCommand(BaseCommand):
     def run(self) -> User:
         self.validate()
         try:
-            print(123, self._token_data)
             user = UserDAO.create(self._data, commit=True)
             # create access token using JWT
             token = jwt.encode({'email': self._properties['email'], 'exp': datetime.utcnow() + timedelta(minutes=30)}, BaseConfig.SECRET_KEY)
@@ -32,7 +31,6 @@ class RegisterUserCommand(BaseCommand):
             self._token_data['user_id'] = user.get_id()
             token_obj = TokenDAO.create(self._token_data, commit=True)
         except DAOCreateFailedError as exception:
-            print(exception)
             raise UserCreateFailedError() from exception
         return user, token_obj
 
