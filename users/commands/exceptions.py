@@ -10,15 +10,22 @@ class UsersEmailExistsValidationError(ValidationError):
         super().__init__([_("Must be unique")], field_name="email")
 
 
-class UserNotFoundError(ObjectNotFoundError):
-    def __init__(
-            self, user_id: Optional[str] = None, exception: Optional[Exception] = None
-    ) -> None:
-        super().__init__("User", user_id, exception)
+class UserPasswordValidationError(ValidationError):
+    def __init__(self) -> None:
+        super().__init__([_("Wrong password")], field_name="password")
+
+
+class UserNotFoundError(ValidationError):
+    def __init__(self) -> None:
+        super().__init__([_("User not found")], field_name="email")
 
 
 class UserCreateFailedError(CreateFailedError):
     message = "User couldn't be created"
+
+
+class UserTokenFailedError(CommandInvalidError):
+    message = "User couldn't be logged in"
 
 
 class UserInvalidError(CommandInvalidError):

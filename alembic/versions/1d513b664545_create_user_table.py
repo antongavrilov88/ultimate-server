@@ -19,9 +19,9 @@ depends_on = None
 def upgrade() -> None:
     op.create_table(
         'users',
-        sa.Column('id', sa.Integer, primary_key=True),
-        sa.Column('email', sa.String(50), nullable=False),
-        sa.Column('password', sa.String(50), nullable=False)
+        sa.Column('id', sa.Integer(), primary_key=True),
+        sa.Column('email', sa.String(256), nullable=False),
+        sa.Column('password', sa.String(256), nullable=False)
     )
 
 

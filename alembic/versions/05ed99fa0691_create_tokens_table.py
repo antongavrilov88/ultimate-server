@@ -19,8 +19,9 @@ depends_on = None
 def upgrade() -> None:
     op.create_table(
         'tokens',
+        sa.Column('id', sa.Integer(), primary_key=True),
         sa.Column('user_id', sa.Integer(), nullable=False),
-        sa.Column('token', sa.String(), nullable=False),
+        sa.Column('token', sa.String(256), nullable=False),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'])
     )
 

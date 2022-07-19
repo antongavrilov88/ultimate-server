@@ -8,9 +8,7 @@ class UserDAO(BaseDAO):
 
     @staticmethod
     def get_by_email(email: str) -> User:
-        user = User.get(email)
-        if not user:
-            raise UserNotFoundError()
+        user = User.get_by_email(email)
         return user
 
     @staticmethod
@@ -20,5 +18,4 @@ class UserDAO(BaseDAO):
         from api import db
         user_query = db.session.query(User).filter(User.email == email)
         return not db.session.query(user_query.exists()).scalar()
-
 

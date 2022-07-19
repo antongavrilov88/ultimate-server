@@ -1,11 +1,12 @@
-from flask import request, make_response, jsonify
-from flask_restx import Resource, Namespace, fields, abort, marshal
+from flask import request
+from flask_restx import Resource, Namespace, fields
 
-from api.Exeptions import make_bad_request_response, APIError, ValidationError
+from api.Exeptions import make_bad_request_response, APIError
 from api.UltimateServerResponseCreator import UltimateServerResponseCreator
+from auth.commands.login import LoginUserCommand
 from auth.commands.register import RegisterUserCommand
 from commands.exceptions import CreateFailedError
-from users.commands.exceptions import UserInvalidError
+from users.commands.exceptions import UserInvalidError, UserTokenFailedError
 
 api = Namespace('auth', description='Authorization related operations')
 
@@ -17,6 +18,7 @@ register_request = api.model('register_request', {
 register_data_content = api.model('register_data_content', {
     'id': fields.Integer(readonly=True),
     'email': fields.String(readonly=True, description='The task...'),
+    'token': fields.String(readonly=True, description='The task...')
 })
 
 register_data = api.model('register_data', {
@@ -33,8 +35,13 @@ login_request = api.model('login_request', {
     'password': fields.String(description='The task...'),
 })
 
+login_data_content = api.model('login_data_content', {
+    "token": fields.String()
+})
+
 login_data = api.model('login_data', {
-    "token": fields.String
+    "type": fields.String(),
+    "data": fields.Nested(login_data_content)
 })
 
 
@@ -43,6 +50,15 @@ login_data = api.model('login_data', {
 def handle_email_conflict_exception(error):
     """This is an email conflict error"""
     return {'message': error.message}, 409
+
+
+
+@api.errorhandler(UserTokenFailedError)
+@api.marshal_with(register_error, code=401, description="Email already used")
+def handle_email_conflict_exception(error):
+    """This is a login error"""
+    return {'message': error.message}, 401
+
 
 
 @api.errorhandler(CreateFailedError)
@@ -76,8 +92,13 @@ class RegisterRestApi(Resource):
     def post(self):
         if not request.is_json:
             return make_bad_request_response(APIError.WRONG_API)
-        new_user = RegisterUserCommand(request.json).run()
-        return self.response_creator.response_201(new_user)
+        new_user, new_token = RegisterUserCommand(request.json).run()
+        response_obj = {
+            "id": new_user.id,
+            "email": new_user.email,
+            "token": new_token.token,
+        }
+        return self.response_creator.response_201(response_obj)
 
 
 @api.route('/login')
@@ -95,4 +116,7 @@ class LoginRestApi(Resource):
     @api.expect(login_request, validate=True)
     @api.marshal_with(login_data, code=201, description="User logged in")
     def post(self):
-        pass
+        if not request.is_json:
+            return make_bad_request_response(APIError.WRONG_API)
+        logged_in_response = LoginUserCommand(request.json).run()
+        return self.response_creator.response_201(logged_in_response)
