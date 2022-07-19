@@ -5,7 +5,7 @@ from api.Exeptions import make_bad_request_response, APIError, ValidationError
 from api.UltimateServerResponseCreator import UltimateServerResponseCreator
 from auth.commands.register import RegisterUserCommand
 from commands.exceptions import CreateFailedError
-from users.commands.exceptions import UsersEmailExistsValidationError, UserCreateFailedError, UserInvalidError
+from users.commands.exceptions import UserInvalidError
 
 api = Namespace('auth', description='Authorization related operations')
 
@@ -26,6 +26,15 @@ register_data = api.model('register_data', {
 
 register_error = api.model('register_error', {
     'message': fields.String(readonly=True)
+})
+
+login_request = api.model('login_request', {
+    'email': fields.String(description='The task...'),
+    'password': fields.String(description='The task...'),
+})
+
+login_data = api.model('login_data', {
+    "token": fields.String
 })
 
 
@@ -51,7 +60,7 @@ def handle_internal_server_exception(error):
 
 
 @api.route('/register')
-class AuthRestApi(Resource):
+class RegisterRestApi(Resource):
     """Register new user"""
 
     response_creator = UltimateServerResponseCreator('auth')
@@ -69,3 +78,21 @@ class AuthRestApi(Resource):
             return make_bad_request_response(APIError.WRONG_API)
         new_user = RegisterUserCommand(request.json).run()
         return self.response_creator.response_201(new_user)
+
+
+@api.route('/login')
+class LoginRestApi(Resource):
+    """Login existing user"""
+
+    response_creator = UltimateServerResponseCreator('auth')
+
+    @api.doc('login_user', responses={
+        201: 'Success',
+        400: 'Wrong API',
+        409: 'User already logged in',
+        500: 'Internal server'
+    })
+    @api.expect(login_request, validate=True)
+    @api.marshal_with(login_data, code=201, description="User logged in")
+    def post(self):
+        pass

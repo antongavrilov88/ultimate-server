@@ -10,8 +10,6 @@ authorizations = {
     }
 }
 
-# api = Api(sequrity='Bearer Auth', authorizations=authorizations, version='1.0', title='AGwallet API')
-
 api = Api(sequrity='Bearer Auth', authorizations=authorizations, title="AGwallet API", version="1.0",
           description="Project API")
 
