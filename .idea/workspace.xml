@@ -2,19 +2,31 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9b23548c-5d40-4d93-8ccc-03f3218f0a2e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/auth/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auth/api.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auth/schema.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/users/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/users/api.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/users/schemas.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/ultimate-server.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ultimate-server.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/Exeptions.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/UltimateServerResponseCreator.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/helpers.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auth/commands/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auth/commands/error_types.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auth/commands/register.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/commands/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/commands/base.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/commands/exceptions.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dao/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dao/base.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dao/exceptions.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/errors.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/exceptions.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/users/commands/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/users/commands/exceptions.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/users/dao.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth/api.py" beforeDir="false" afterPath="$PROJECT_DIR$/auth/api.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/api.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/api.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,6 +41,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="modelRestApi" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -48,6 +65,12 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/users/commands" />
+      <recent name="$PROJECT_DIR$/users" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="ultimate-server" />

@@ -16,7 +16,7 @@ class HelloWorld(Resource):
         try:
             return {'hello': 'get'}
         except Exception as er:
-            print(er)
+            pass
 
 
 @api.route('/hello_post')
