@@ -20,6 +20,11 @@ class UserNotFoundError(ValidationError):
         super().__init__([_("User not found")], field_name="email")
 
 
+class UserAlreadyLoggedInError(ValidationError):
+    def __init__(self) -> None:
+        super().__init__([_("User already logged in")], field_name="email")
+
+
 class UserCreateFailedError(CreateFailedError):
     message = "User couldn't be created"
 

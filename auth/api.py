@@ -110,6 +110,7 @@ class LoginRestApi(Resource):
     @api.doc('login_user', responses={
         201: 'Success',
         400: 'Wrong API',
+        401: 'Login failed',
         409: 'User already logged in',
         500: 'Internal server'
     })
@@ -120,3 +121,13 @@ class LoginRestApi(Resource):
             return make_bad_request_response(APIError.WRONG_API)
         logged_in_response = LoginUserCommand(request.json).run()
         return self.response_creator.response_201(logged_in_response)
+
+
+@api.route('/logout')
+class LogoutRestApi(Resource):
+    """Logout user"""
+
+    response_creator = UltimateServerResponseCreator('auth')
+
+    def delete(self):
+        pass
