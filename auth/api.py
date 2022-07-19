@@ -64,7 +64,7 @@ class AuthRestApi(Resource):
         500: 'Internal server'
     })
     @api.expect(register_request, validate=True)
-    @api.marshal_with(register_data_content, code=201, description="User created")
+    @api.marshal_with(register_data, code=201, description="User created")
     @api.marshal_with(register_error, code=400, description="Wrong API")
     @api.marshal_with(register_error, code=409, description="Email already registered")
     @api.marshal_with(register_error, code=500, description="User couldn't be created")
@@ -72,4 +72,4 @@ class AuthRestApi(Resource):
         if not request.is_json:
             return make_bad_request_response(APIError.WRONG_API)
         new_user = RegisterUserCommand(request.json).run()
-        return new_user, 201
+        return self.response_creator.response_201(new_user)
