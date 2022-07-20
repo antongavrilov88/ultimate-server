@@ -9,6 +9,7 @@ from flask_restx import Resource, Namespace, fields
 from api.Exeptions import make_bad_request_response, APIError
 from api.UltimateServerResponseCreator import UltimateServerResponseCreator
 from auth.commands.login import LoginUserCommand
+from auth.commands.logout import LogoutUserCommand
 from auth.commands.register import RegisterUserCommand
 from auth.dao import TokenDAO
 from commands.exceptions import CreateFailedError
@@ -129,8 +130,8 @@ class LoginRestApi(Resource):
     def post(self):
         if not request.is_json:
             return make_bad_request_response(APIError.WRONG_API)
-        logged_in_response = LoginUserCommand(request.json).run()
-        return self.response_creator.response_201(logged_in_response)
+        login_response = LoginUserCommand(request.json).run()
+        return self.response_creator.response_201(login_response)
 
 
 @api.route('/logout')
@@ -142,11 +143,11 @@ class LogoutRestApi(Resource):
     @api.doc('logout_user', responses={
         200: 'Success',
         400: 'Wrong API',
-        401: 'Login failed',
-        409: 'User already logged in',
+        401: 'Logout failed',
         500: 'Internal server'
     })
     @api.doc(security='apikey')
     @token_required
-    def delete(self, current_user):
-        return self.response_creator.response_200({'success': '1234'})
+    def delete(self, current_user, users_token):
+        logout_response = LogoutUserCommand(users_token).run()
+        return self.response_creator.response_200(logout_response)

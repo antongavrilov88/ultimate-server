@@ -31,6 +31,7 @@ class LoginUserCommand(BaseCommand):
         exceptions: List[ValidationError] = []
         email: Optional[str] = self._properties.get('email')
         password: Optional[str] = self._properties.get('password')
+        
         user = UserDAO.get_by_email(email)
 
         if not user:

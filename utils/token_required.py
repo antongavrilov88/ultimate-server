@@ -36,6 +36,6 @@ def token_required(f):
         if is_token_expired:
             token_obj.set_jwt_token_inactive()
             TokenDAO.save(token_obj)
-        return f(*args, **kwargs, current_user=current_user)
+        return f(*args, **kwargs, current_user=current_user, users_token=token)
 
     return decorator
