@@ -22,6 +22,7 @@ def upgrade() -> None:
         sa.Column('id', sa.Integer(), primary_key=True),
         sa.Column('user_id', sa.Integer(), nullable=False),
         sa.Column('token', sa.String(256), nullable=False),
+        sa.Column('jwt_token_active', sa.Boolean()),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'])
     )
 

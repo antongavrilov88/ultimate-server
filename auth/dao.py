@@ -7,8 +7,8 @@ class TokenDAO(BaseDAO):
     model_cls = Token
 
     @staticmethod
-    def get_by_email(user: User) -> Token:
+    def get_by_value(token: str) -> Token:
         from api import db
-        token_query = db.session.query(Token).filter(Token.user_id == user.id)
+        token_query = db.session.query(Token).filter(Token.token == token)
         token = token_query.one_or_none()
         return token

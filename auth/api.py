@@ -1,14 +1,24 @@
-from flask import request
+from datetime import datetime, timedelta
+from functools import wraps
+
+import jwt
+from flask import request, make_response
+from flask_appbuilder.hooks import before_request
 from flask_restx import Resource, Namespace, fields
 
 from api.Exeptions import make_bad_request_response, APIError
 from api.UltimateServerResponseCreator import UltimateServerResponseCreator
 from auth.commands.login import LoginUserCommand
 from auth.commands.register import RegisterUserCommand
+from auth.dao import TokenDAO
 from commands.exceptions import CreateFailedError
+from config import BaseConfig
+from models.user import User
 from users.commands.exceptions import UserInvalidError, UserTokenFailedError
+# from utils import token_required
+from utils.token_required import token_required
 
-api = Namespace('auth', description='Authorization related operations')
+api = Namespace('auth', description='Authorization related operations', sequrity='Bearer Auth')
 
 register_request = api.model('register_request', {
     'email': fields.String(description='The task...'),
@@ -44,6 +54,8 @@ login_data = api.model('login_data', {
     "data": fields.Nested(login_data_content)
 })
 
+logout_user = api.model('logout_user', {'success': fields.String()})
+
 
 @api.errorhandler(UserInvalidError)
 @api.marshal_with(register_error, code=409, description="Email already used")
@@ -52,13 +64,11 @@ def handle_email_conflict_exception(error):
     return {'message': error.message}, 409
 
 
-
 @api.errorhandler(UserTokenFailedError)
 @api.marshal_with(register_error, code=401, description="Email already used")
 def handle_email_conflict_exception(error):
     """This is a login error"""
     return {'message': error.message}, 401
-
 
 
 @api.errorhandler(CreateFailedError)
@@ -129,5 +139,14 @@ class LogoutRestApi(Resource):
 
     response_creator = UltimateServerResponseCreator('auth')
 
-    def delete(self):
-        pass
+    @api.doc('logout_user', responses={
+        200: 'Success',
+        400: 'Wrong API',
+        401: 'Login failed',
+        409: 'User already logged in',
+        500: 'Internal server'
+    })
+    @api.doc(security='apikey')
+    @token_required
+    def delete(self, current_user):
+        return self.response_creator.response_200({'success': '1234'})

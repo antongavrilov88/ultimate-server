@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+
 from flask_appbuilder import Model
 
 from sqlalchemy import (
     Column,
     Integer,
-    String,
+    String, Boolean,
 )
 from sqlalchemy.sql.elements import BinaryExpression
 
@@ -17,6 +18,7 @@ class User(Model):
     id = Column(Integer, primary_key=True)
     email = Column(String(256), nullable=False)
     password = Column(String(256), nullable=False)
+    is_admin = Column(Boolean())
 
     def __repr__(self) -> str:
         return f'User<{self.id}>'

@@ -103,7 +103,6 @@ class BaseDAO:
             setattr(model, key, value)
         try:
             from api import db
-            print(876, model)
             db.session.add(model)
             if commit:
                 db.session.commit()
