@@ -23,6 +23,10 @@ class UltimateServerResponseCreator:
         message = message or "Could not process entity"
         return self.create_base_error_response_object(message)
 
+    def response_403(self, message: str = None):
+        message = message or "Access denied"
+        return self.create_base_error_response_object(message)
+
     def response_500(self, message):
         return self.create_base_error_response_object(message), 500
 

@@ -15,6 +15,14 @@ class DAOCreateFailedError(DAOException):
     message = "Create failed"
 
 
+class DAOGetFailedError(DAOException):
+    """
+    DAO Get failed
+    """
+
+    message = "Get failed"
+
+
 class DAOUpdateFailedError(DAOException):
     """
     DAO Update failed

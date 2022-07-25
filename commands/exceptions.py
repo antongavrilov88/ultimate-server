@@ -45,11 +45,10 @@ class ObjectNotFoundError(CommandException):
             exception: Optional[Exception] = None,
     ) -> None:
         super().__init__(
-            _(
-                self.message_format.format(
+            self.message_format.format(
                     object_type, '"%s" ' % object_id if object_id else ""
                 )
-            ),
+            ,
             exception,
         )
 

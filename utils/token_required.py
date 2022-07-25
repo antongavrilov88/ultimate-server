@@ -13,8 +13,10 @@ def token_required(f):
     @wraps(f)
     def decorator(*args, **kwargs):
         token = None
-        if "authorization" in request.headers:
+        if "Authorization" in request.headers:
             token = request.headers["authorization"]
+        if "Authorization" not in request.headers:
+            return make_response({'message': 'Unauthorized'}, 401)
         if not token:
             return make_response({'message': 'Unauthorized'}, 401)
 
@@ -31,7 +33,7 @@ def token_required(f):
         expiration_time = datetime.utcfromtimestamp(token_data["exp"])
         now = datetime.utcnow()
 
-        is_token_expired = now < expiration_time
+        is_token_expired = now > expiration_time
 
         if is_token_expired:
             token_obj.set_jwt_token_inactive()

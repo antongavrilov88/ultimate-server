@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 from flask_appbuilder import Model
 
 from sqlalchemy import (
@@ -30,8 +29,21 @@ class User(Model):
         qry = session.query(User).filter(email_filter(email))
         return qry.one_or_none()
 
+    @classmethod
+    def get_data(cls, user: User, minimal=True):
+        data = {
+            "id": user.id
+        }
+        if not minimal:
+            data["attributes"] = {
+                "email": user.email,
+                "is_admin": user.is_admin
+            }
+        return data
+
     def get_id(self):
         return self.id
+
 
 def email_filter(email: str) -> BinaryExpression:
     return User.email == email

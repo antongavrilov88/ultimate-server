@@ -1,9 +1,4 @@
-from datetime import datetime, timedelta
-from functools import wraps
-
-import jwt
-from flask import request, make_response
-from flask_appbuilder.hooks import before_request
+from flask import request
 from flask_restx import Resource, Namespace, fields
 
 from api.Exeptions import make_bad_request_response, APIError
@@ -11,12 +6,8 @@ from api.UltimateServerResponseCreator import UltimateServerResponseCreator
 from auth.commands.login import LoginUserCommand
 from auth.commands.logout import LogoutUserCommand
 from auth.commands.register import RegisterUserCommand
-from auth.dao import TokenDAO
 from commands.exceptions import CreateFailedError
-from config import BaseConfig
-from models.user import User
-from users.commands.exceptions import UserInvalidError, UserTokenFailedError
-# from utils import token_required
+from users.commands.exceptions import UserInvalidError, UserTokenFailedError, UsersEmailExistsValidationError
 from utils.token_required import token_required
 
 api = Namespace('auth', description='Authorization related operations', sequrity='Bearer Auth')
@@ -37,7 +28,7 @@ register_data = api.model('register_data', {
     'data': fields.Nested(register_data_content)
 })
 
-register_error = api.model('register_error', {
+register_error: object = api.model('register_error', {
     'message': fields.String(readonly=True)
 })
 
@@ -59,15 +50,18 @@ logout_user = api.model('logout_user', {'success': fields.String()})
 
 
 @api.errorhandler(UserInvalidError)
+# @api.errorhandler(UsersEmailExistsValidationError)
 @api.marshal_with(register_error, code=409, description="Email already used")
 def handle_email_conflict_exception(error):
+    print(123)
     """This is an email conflict error"""
     return {'message': error.message}, 409
 
 
 @api.errorhandler(UserTokenFailedError)
-@api.marshal_with(register_error, code=401, description="Email already used")
+@api.marshal_with(register_error, code=401, description="Unauthorized")
 def handle_email_conflict_exception(error):
+    print(456)
     """This is a login error"""
     return {'message': error.message}, 401
 
@@ -75,6 +69,7 @@ def handle_email_conflict_exception(error):
 @api.errorhandler(CreateFailedError)
 @api.marshal_with(register_error, code=500, description="User couldn't be created")
 def handle_entity_processing_exception(error):
+    print(789)
     """This is an unknown error"""
     return {'message': error.message}, 500
 
@@ -82,6 +77,7 @@ def handle_entity_processing_exception(error):
 @api.errorhandler(Exception)
 @api.marshal_with(register_error, code=500, description="Internal server error")
 def handle_internal_server_exception(error):
+    print(1011)
     """This is an internal server error"""
     return {'message': error}, 500
 
@@ -140,6 +136,7 @@ class LogoutRestApi(Resource):
 
     response_creator = UltimateServerResponseCreator('auth')
 
+    @token_required
     @api.doc('logout_user', responses={
         200: 'Success',
         400: 'Wrong API',
@@ -147,7 +144,6 @@ class LogoutRestApi(Resource):
         500: 'Internal server'
     })
     @api.doc(security='apikey')
-    @token_required
     def delete(self, current_user, users_token):
         logout_response = LogoutUserCommand(users_token).run()
         return self.response_creator.response_200(logout_response)

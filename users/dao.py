@@ -1,4 +1,3 @@
-from users.commands.exceptions import UserNotFoundError
 from dao.base import BaseDAO
 from models.user import User
 
