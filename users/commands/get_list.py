@@ -7,7 +7,8 @@ from commands.base import BaseCommand
 from commands.exceptions import CommandInvalidError
 from dao.exceptions import DAOGetFailedError
 from models.user import User
-from users.commands.exceptions import UsersListLimitAccessError, GetUsersListError, AccessDeniedError
+from users.commands.exceptions import UsersListLimitAccessError, GetUsersListError, AccessDeniedError, \
+    UnknownUserRequestError
 from users.dao import UserDAO
 
 
@@ -22,12 +23,9 @@ class GetUsersListCommand(BaseCommand):
             users_list = UserDAO.find_all()
         except DAOGetFailedError as exception:
             raise GetUsersListError from exception
+        except Exception:
+            raise UnknownUserRequestError()
         return users_list
 
     def validate(self) -> None:
-        exceptions: List[ValidationError] = []
-
-        if exceptions:
-            exception = GetUsersListError()
-            exception.add_list(exceptions)
-            raise exception
+        pass

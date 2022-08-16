@@ -8,22 +8,17 @@ from commands.exceptions import CreateFailedError, CommandInvalidError, CommandE
 
 class UsersEmailExistsValidationError(ValidationError):
     def __init__(self) -> None:
-        super().__init__([_("Must be unique")], field_name="email")
+        super().__init__(["Must be unique"], field_name="email")
 
 
 class UserPasswordValidationError(ValidationError):
     def __init__(self) -> None:
-        super().__init__([_("Wrong password")], field_name="password")
+        super().__init__(["Wrong password"], field_name="password")
 
 
-# class UserNotFoundError(ValidationError):
-#     def __init__(self) -> None:
-#         super().__init__([_("User not found")], field_name="email")
-
-
-class UserAlreadyLoggedInError(ValidationError):
+class UserDoesNotExistError(ValidationError):
     def __init__(self) -> None:
-        super().__init__([_("User already logged in")], field_name="email")
+        super().__init__(["User not found"], field_name="email")
 
 
 class UserCreateFailedError(CreateFailedError):
@@ -40,6 +35,14 @@ class UserAuthorizationError(CommandInvalidError):
 
 class UserInvalidError(CommandInvalidError):
     message = "User parameters are invalid."
+
+
+class EmailConflictError(CommandInvalidError):
+    message = "Email already taken."
+
+
+class UserDoesNotExistenceError(CommandInvalidError):
+    message = "User not found."
 
 
 class UsersListLimitAccessError(CommandInvalidError):
@@ -62,7 +65,13 @@ class AccessDeniedError(CommandInvalidError):
     message = "Access denied"
 
 
-class UserNotFoundError(ObjectNotFoundError):
-    def __init__(self, user_id: Optional[str] = None,
-                 exception: Optional[Exception] = None) -> None:
-        super().__init__("User", user_id, exception)
+class UserNotFoundError(CommandInvalidError):
+    message = "User not found."
+
+
+class UnknownUserRequestError(CommandInvalidError):
+    message = "Unknown internal server error."
+
+
+class WrongPasswordValidationError(CommandInvalidError):
+    message = "Wrong password."

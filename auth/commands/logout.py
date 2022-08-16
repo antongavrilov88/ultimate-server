@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 
 from api.Exeptions import ValidationError
-from auth.commands.exceptions import TokenNotFoundError, TokenInvalidError, UserTokenFailedError
+from auth.commands.exceptions import TokenNotFoundError, TokenInvalidError, UserTokenFailedError, UnknownAuthError
 from auth.dao import TokenDAO
 from commands.base import BaseCommand
 from dao.exceptions import DAOCreateFailedError
@@ -18,20 +18,18 @@ class LogoutUserCommand(BaseCommand):
             TokenDAO.update(self._token_obj, {"jwt_token_active": False}, commit=True)
         except DAOCreateFailedError as exception:
             raise UserTokenFailedError() from exception
+        except Exception:
+            raise UnknownAuthError()
         return {"logout_status": "success"}
 
     def validate(self) -> None:
-        exceptions: List[ValidationError] = []
         token = self._token
 
         token_obj = TokenDAO.get_by_value(token)
 
         if not token_obj:
-            exceptions.append(TokenNotFoundError)
+            raise TokenInvalidError()
 
         self._token_obj = token_obj
 
-        if exceptions:
-            exception = TokenInvalidError()
-            exception.add_list(exceptions)
-            raise exception
+

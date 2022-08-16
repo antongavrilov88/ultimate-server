@@ -1,10 +1,8 @@
-from typing import List
-
-from api.Exeptions import ValidationError
 from commands.base import BaseCommand
 from dao.exceptions import DAOGetFailedError
 from models.user import User
-from users.commands.exceptions import GetUserError, UserNotFoundError
+from users.commands.exceptions import GetUserError, \
+     UserDoesNotExistenceError, UnknownUserRequestError
 from users.dao import UserDAO
 
 
@@ -18,20 +16,14 @@ class GetUserCommand(BaseCommand):
             user = UserDAO.find_by_id(self._user_id)
         except DAOGetFailedError as exception:
             raise GetUserError from exception
+        except Exception:
+            raise UnknownUserRequestError()
         return user
 
     def validate(self) -> None:
-        exceptions: List[ValidationError] = []
         user_id = self._user_id
 
-        try:
-            user = UserDAO.find_by_id(user_id)
-            if not user:
-                raise UserNotFoundError()
-        except ValidationError as ex:
-            exceptions.append(ex)
+        user = UserDAO.find_by_id(user_id)
+        if not user:
+            raise UserDoesNotExistenceError()
 
-        if exceptions:
-            exception = GetUserError()
-            exception.add_list(exceptions)
-            raise exception

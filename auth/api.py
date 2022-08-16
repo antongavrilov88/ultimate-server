@@ -3,24 +3,66 @@ from flask_restx import Resource, Namespace, fields
 
 from api.Exeptions import make_bad_request_response, APIError
 from api.UltimateServerResponseCreator import UltimateServerResponseCreator
+from auth.commands.exceptions import UnknownAuthError
 from auth.commands.login import LoginUserCommand
 from auth.commands.logout import LogoutUserCommand
 from auth.commands.register import RegisterUserCommand
 from commands.exceptions import CreateFailedError
-from users.commands.exceptions import UserInvalidError, UserTokenFailedError, UsersEmailExistsValidationError
+from users.commands.exceptions import UserTokenFailedError, UsersEmailExistsValidationError, \
+    UserPasswordValidationError, EmailConflictError, UserNotFoundError, WrongPasswordValidationError
 from utils.token_required import token_required
 
 api = Namespace('auth', description='Authorization related operations', sequrity='Bearer Auth')
 
-register_request = api.model('register_request', {
+register_attributes = api.model('register_attributes', {
     'email': fields.String(description='The task...'),
     'password': fields.String(description='The task...'),
 })
 
+login_attributes = api.model('login_attributes', {
+    'email': fields.String(description='The task...'),
+    'password': fields.String(description='The task...'),
+})
+
+register_response_attributes = api.model('register_response_attributes', {
+    'email': fields.String(description='Users email'),
+    'is_admin': fields.Boolean(description='Is user admin')
+})
+
+login_response_attributes = api.model('login_response_attributes', {
+    'email': fields.String(description='Users email'),
+    'is_admin': fields.Boolean(description='Is user admin')
+})
+
+auth_token_model = api.model('auth_token_model', {
+    'token': fields.String(description='Access token')
+})
+
+auth_relationships = api.model('auth_relationships', {
+    'token': fields.Nested(auth_token_model)
+})
+
+register_data_model = api.model('register_data_model', {
+    'attributes': fields.Nested(register_attributes),
+})
+
+login_data_model = api.model('login_data_model', {
+    'attributes': fields.Nested(login_attributes),
+})
+
+register_data_response_model = api.model('register_data_response_model', {
+    'attributes': fields.Nested(register_response_attributes)
+})
+
+register_request = api.model('register_request', {
+    'type': fields.String(description='The task...'),
+    'data': fields.Nested(register_data_model),
+})
+
 register_data_content = api.model('register_data_content', {
     'id': fields.Integer(readonly=True),
-    'email': fields.String(readonly=True, description='The task...'),
-    'token': fields.String(readonly=True, description='The task...')
+    'attributes': fields.Nested(register_response_attributes),
+    'relationships': fields.Nested(auth_relationships)
 })
 
 register_data = api.model('register_data', {
@@ -33,12 +75,14 @@ register_error: object = api.model('register_error', {
 })
 
 login_request = api.model('login_request', {
-    'email': fields.String(description='The task...'),
-    'password': fields.String(description='The task...'),
+    'type': fields.String(description='The task...'),
+    'data': fields.Nested(register_data_model),
 })
 
 login_data_content = api.model('login_data_content', {
-    "token": fields.String()
+    'id': fields.Integer(readonly=True),
+    'attributes': fields.Nested(login_response_attributes),
+    'relationships': fields.Nested(auth_relationships)
 })
 
 login_data = api.model('login_data', {
@@ -49,35 +93,44 @@ login_data = api.model('login_data', {
 logout_user = api.model('logout_user', {'success': fields.String()})
 
 
-@api.errorhandler(UserInvalidError)
-# @api.errorhandler(UsersEmailExistsValidationError)
+@api.errorhandler(EmailConflictError)
 @api.marshal_with(register_error, code=409, description="Email already used")
 def handle_email_conflict_exception(error):
-    print(123)
     """This is an email conflict error"""
     return {'message': error.message}, 409
+
+
+@api.errorhandler(WrongPasswordValidationError)
+@api.marshal_with(register_error, code=401, description="Email already used")
+def handle_email_conflict_exception(error):
+    """This is a wrong password error"""
+    return {'message': error.message}, 401
 
 
 @api.errorhandler(UserTokenFailedError)
 @api.marshal_with(register_error, code=401, description="Unauthorized")
 def handle_email_conflict_exception(error):
-    print(456)
     """This is a login error"""
     return {'message': error.message}, 401
+
+
+@api.errorhandler(UserNotFoundError)
+@api.marshal_with(register_error, code=404, description="User not found")
+def handle_email_conflict_exception(error):
+    """This is a user existence error"""
+    return {'message': error.message}, 404
 
 
 @api.errorhandler(CreateFailedError)
 @api.marshal_with(register_error, code=500, description="User couldn't be created")
 def handle_entity_processing_exception(error):
-    print(789)
     """This is an unknown error"""
     return {'message': error.message}, 500
 
 
-@api.errorhandler(Exception)
+@api.errorhandler(UnknownAuthError)
 @api.marshal_with(register_error, code=500, description="Internal server error")
 def handle_internal_server_exception(error):
-    print(1011)
     """This is an internal server error"""
     return {'message': error}, 500
 
@@ -102,8 +155,15 @@ class RegisterRestApi(Resource):
         new_user, new_token = RegisterUserCommand(request.json).run()
         response_obj = {
             "id": new_user.id,
-            "email": new_user.email,
-            "token": new_token.token,
+            "attributes": {
+                "email": new_user.email,
+                "is_admin": new_user.is_admin
+            },
+            "relationships": {
+                "token": {
+                    "token": new_token.token,
+                }
+            },
         }
         return self.response_creator.response_201(response_obj)
 
@@ -126,8 +186,20 @@ class LoginRestApi(Resource):
     def post(self):
         if not request.is_json:
             return make_bad_request_response(APIError.WRONG_API)
-        login_response = LoginUserCommand(request.json).run()
-        return self.response_creator.response_201(login_response)
+        user, token = LoginUserCommand(request.json).run()
+        response_obj = {
+            "id": user.id,
+            "attributes": {
+                "email": user.email,
+                "is_admin": user.is_admin
+            },
+            "relationships": {
+                "token": {
+                    "token": token.token,
+                }
+            },
+        }
+        return self.response_creator.response_201(response_obj)
 
 
 @api.route('/logout')
