@@ -1,7 +1,6 @@
-from typing import Optional, Dict, Any, List
+from typing import Optional
 from flask_babel import gettext as _
 
-from api.Exeptions import ValidationError
 from exceptions import UltimateServerException
 
 
@@ -64,17 +63,4 @@ class CommandInvalidError(CommandException):
     status = 422
 
     def __init__(self, message: str = "") -> None:
-        # self._invalid_exceptions: List[ValidationError] = []
         super().__init__(message)
-
-    # def add(self, exception: ValidationError) -> None:
-    #     self._invalid_exceptions.append(exception)
-    #
-    # def add_list(self, exceptions: List[ValidationError]) -> None:
-    #     self._invalid_exceptions.extend(exceptions)
-    #
-    # def normalized_messages(self) -> Dict[Any, Any]:
-    #     errors: Dict[Any, Any] = {}
-    #     for exception in self._invalid_exceptions:
-    #         errors.update(exception.normalized_messages())
-    #     return errors

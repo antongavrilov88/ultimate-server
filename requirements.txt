@@ -9,3 +9,4 @@ fields~=5.0.0
 PyJWT~=2.4.0
 Werkzeug~=2.1.2
 python-dotenv~=0.20.0
+coverage~=6.4.4
